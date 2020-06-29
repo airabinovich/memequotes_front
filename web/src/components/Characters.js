@@ -16,7 +16,7 @@ const cols = [
 ];
 
 export default () => {
-    const [allCharacters, setAllCharacters] = React.useState([{"name": "No Character", "id": 1, "fun_facts": "no fun"}]);
+    const [allCharacters, setAllCharacters] = React.useState([]);
 
     React.useEffect(() => {
         let characters = getAllCharacters();
@@ -30,8 +30,6 @@ export default () => {
             ))
         })
     }, []);
-
-    console.log("ALL CHARACTERS:", allCharacters)
 
     return (
         <Table cols={cols} rows={allCharacters}/>
