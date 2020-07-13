@@ -3,7 +3,6 @@ package character
 import (
 	"github.com/airabinovich/memequotes_front/api/client"
 	commonContext "github.com/airabinovich/memequotes_front/api/context"
-	httpCommons "github.com/airabinovich/memequotes_front/api/http"
 	"github.com/airabinovich/memequotes_front/api/rest"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -12,7 +11,7 @@ import (
 var memequotesBackClient client.MemequotesBackendClient
 
 func Initialize() {
-	memequotesBackClient = NewMemequotesBackendClient("http://localhost:9000", httpCommons.Client())
+	memequotesBackClient = client.NewMemequotesBackendDefaultClient()
 }
 
 func GetAllCharacters(c *gin.Context) {
@@ -24,7 +23,7 @@ func getAllCharacters(c *gin.Context) *rest.APIError {
 	logger := commonContext.Logger(ctx)
 
 	logger.Debug("Getting all characters")
-	chs, err := memequotesBackClient.GetAll(c)
+	chs, err := memequotesBackClient.GetAllCharacters(c)
 	if err != nil {
 		logger.Error("get all character", err)
 		return rest.NewInternalServerError(err.Error())

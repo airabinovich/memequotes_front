@@ -1,4 +1,4 @@
-package character
+package client
 
 import (
 	"encoding/json"
@@ -13,16 +13,11 @@ import (
 	"time"
 )
 
-type wrappedResponse struct {
+type wrappedCharacterResponse struct {
 	Results []model.CharacterResult `json:"results"`
 }
 
-type MemequotesBackendHttpClient struct {
-	host   string
-	client *http.Client
-}
-
-func (client MemequotesBackendHttpClient) GetAll(ctx *gin.Context) ([]model.CharacterResult, error) {
+func (client MemequotesBackendHttpClient) GetAllCharacters(ctx *gin.Context) ([]model.CharacterResult, error) {
 	logger := commonContext.Logger(ctx)
 
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/characters", client.host), nil)
@@ -50,7 +45,7 @@ func (client MemequotesBackendHttpClient) GetAll(ctx *gin.Context) ([]model.Char
 			}
 
 			return nil
-		}, 2, time.Duration(config.Conf.GetInt64("client.cars.sleep_retry"))*time.Millisecond)
+		}, 2, time.Duration(config.Conf.GetTimeDuration("client.memequotes_backend.sleep_retry")))
 	if err != nil {
 		return []model.CharacterResult{}, err
 	}
@@ -63,7 +58,7 @@ func (client MemequotesBackendHttpClient) GetAll(ctx *gin.Context) ([]model.Char
 		return []model.CharacterResult{}, err
 	}
 
-	var result wrappedResponse
+	var result wrappedCharacterResponse
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
 		logger.Error("Backend response cannot be parsed", err)
@@ -73,9 +68,4 @@ func (client MemequotesBackendHttpClient) GetAll(ctx *gin.Context) ([]model.Char
 	return result.Results, nil
 }
 
-func NewMemequotesBackendClient(host string, client *http.Client) MemequotesBackendHttpClient {
-	return MemequotesBackendHttpClient{
-		host:   host,
-		client: client,
-	}
-}
+
